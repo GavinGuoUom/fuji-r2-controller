@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Fuji R2 · 线路调试台</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 30 18 10l6 8 4-5 8 17M14 16l4 4 4-4M5 34h30"/></svg>
+      <span><strong>FUJI</strong><small>R2 / SERIAL CONSOLE</small></span>
+    </a>
+    <nav aria-label="工具">
+      <button class="tab active" data-page="monitor">运行监控</button>
+      <button class="tab" data-page="guide">引导测试</button>
+      <button class="tab" data-page="tuning">在线调参</button>
+    </nav>
+    <span class="pill" id="link">● 离线</span>
+  </header>
+  <main>
+    <section class="hero">
+      <div>
+        <span class="eyebrow">FUJI R2 / 三路往返控制器</span>
+        <h1 id="page-title">运行监控</h1>
+        <p id="page-description">查看端点事件、PWM 和控制器保护状态。</p>
+      </div>
+      <div class="connection">
+        <label for="ports">115200 &nbsp;/&nbsp; 8N1</label>
+        <div class="connection-row">
+          <select id="ports" aria-label="串口"></select>
+          <button id="refresh" class="icon" type="button" title="刷新串口" aria-label="刷新串口">↻</button>
+          <button id="connect" class="primary">连接</button>
+        </div>
+      </div>
+    </section>
+    <div id="notice" class="notice" role="status" hidden></div>
+    <div class="summary">
+      <div><span>总控开关</span><strong id="master">—</strong></div>
+      <div><span>输出许可</span><strong id="enabled">—</strong></div>
+      <div><span>保护状态</span><strong id="fault">—</strong></div>
+      <div><span>最近采样</span><strong id="age">—</strong></div>
+    </div>
+    <section id="monitor" class="page">
+      <div class="section-head"><h2>线路状态</h2></div>
+      <div id="tracks" class="track-grid"></div>
+      <section class="panel events">
+        <div class="section-head"><h2>事件记录</h2><button id="clear-events" class="subtle">清空</button></div>
+        <ol id="event-list"></ol>
+      </section>
+    </section>
+    <section id="guide" class="page" hidden>
+      <div class="guided-layout">
+        <aside class="panel guide-select">
+          <h2>测试项目</h2>
+          <label for="guide-track">线路</label>
+          <select id="guide-track"><option value="1">线路 1</option><option value="2">线路 2</option><option value="3">线路 3</option></select>
+          <div id="test-options"></div>
+        </aside>
+        <article class="panel guide-stage">
+          <div class="section-head"><span class="eyebrow" id="guide-type"></span><button class="subtle" id="restart">重新开始</button></div>
+          <h2 id="guide-title"></h2>
+          <p id="guide-text"></p>
+          <div class="guide-readout" id="guide-live">等待实时数据</div>
+          <div id="guide-steps"></div>
+          <div class="actions">
+            <button id="confirm" class="primary">确认操作完成</button>
+            <button id="demo-action" hidden>模拟此操作</button>
+          </div>
+        </article>
+        <section class="panel test-panel" aria-labelledby="test-panel-title">
+          <div class="section-head"><h2 id="test-panel-title">实时输入</h2><span class="pill" id="panel-track">线路 1</span></div>
+          <div class="rotaries" id="test-rotaries"></div>
+          <div class="digital-inputs" id="test-digital"></div>
+        </section>
+      </div>
+    </section>
+    <section id="tuning" class="page" hidden>
+      <div class="tuning-layout">
+        <form id="parameters" class="panel">
+          <div class="section-head"><h2>三路共用参数</h2><span>控制器</span></div>
+          <fieldset>
+            <legend>长点灯</legend>
+            <label>最高占空比 <div class="number"><input id="light" type="number" min="0" max="100" step="0.1" required><span>%</span></div></label>
+          </fieldset>
+          <fieldset>
+            <legend>停站时间</legend>
+            <label>最短 <div class="number"><input id="dwell-min" type="number" min="0" max="60" step="0.001" required><span>s</span></div></label>
+            <label>最长 <div class="number"><input id="dwell-max" type="number" min="0" max="60" step="0.001" required><span>s</span></div></label>
+          </fieldset>
+          <fieldset>
+            <legend>满量程加速时间</legend>
+            <label>最快 <div class="number"><input id="ramp-min" type="number" min="0.001" max="60" step="0.001" required><span>s</span></div></label>
+            <label>最慢 <div class="number"><input id="ramp-max" type="number" min="0.001" max="60" step="0.001" required><span>s</span></div></label>
+          </fieldset>
+          <fieldset>
+            <legend>端点减速</legend>
+            <label>传感器到区间末端 <div class="number"><input id="runout" type="number" min="0" max="9999" step="1" required><span>mm</span></div></label>
+            <label>减速时间上限 <div class="number"><input id="brake-max" type="number" min="0" max="60" step="0.001" required><span>s</span></div></label>
+          </fieldset>
+          <fieldset id="rotary-directions" disabled>
+            <legend>旋钮方向</legend>
+            <p class="field-note">勾选需要反向的旋钮。总控 OFF 时应用并保存。</p>
+            <div id="rotary-grid"></div>
+            <div class="actions">
+              <button type="button" id="reverse-all">全部反向</button>
+              <button type="button" id="clear-reverse" class="subtle">取消全部反向</button>
+            </div>
+          </fieldset>
+          <div class="actions">
+            <button type="submit" id="apply" class="primary">立即应用</button>
+            <button type="button" id="save">保存到控制器</button>
+            <button type="button" id="read" class="subtle">重新读取</button>
+          </div>
+          <p id="tuning-reply" role="status"></p>
+        </form>
+        <aside class="panel tuning-note">
+          <span class="eyebrow">TIME KNOB</span>
+          <h2>时间旋钮</h2>
+          <div class="scale"><span>最小端</span><span>最大端</span></div>
+          <dl>
+            <dt>逆时针端</dt><dd>停站短、升速快、到端直接进入停稳</dd>
+            <dt>顺时针端</dt><dd>停站长、升速慢、端点渐降至长点灯占空比</dd>
+          </dl>
+          <p>加速时间指 PWM 走完全量程所需的时间。实际升速时间随速度旋钮的目标变化。</p>
+          <p>停稳阶段另计 0.5 秒。正在进行的停站沿用进入停站时的计时。</p>
+          <p>余距填六个端点中的最短值，0 表示未测。减速上限填 0 则关闭渐降。用实际车辆核对停车位置，停车距离随车速和惯性变化。</p>
+          <p>应用后立即生效。保存前先把总控拨到 OFF，重启后才会沿用保存值。</p>
+        </aside>
+      </div>
+    </section>
+    <footer>FUJI R2 <span>本机串口调试</span></footer>
+  </main>
+</body>
+</html>
