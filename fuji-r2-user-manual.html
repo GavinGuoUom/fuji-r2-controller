@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<title>富士山沙盘｜Fuji R2 控制器使用说明</title>
+<style>
+@page{size:A4;margin:0}
+*{box-sizing:border-box}
+body{margin:0;background:#eae7e1;color:#252825;font:10.6pt/1.62 "Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+.page{position:relative;background:white;width:210mm;min-height:297mm;margin:0 auto;padding:15mm 17mm 18mm;break-after:page}
+.page:last-child{break-after:auto}
+@media print{body{background:white}.page{margin:0;print-color-adjust:exact}}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:9pt;border-bottom:1px solid #c6b9a4;padding-bottom:3mm;color:#53534d}
+.brand{color:#254a40;font-weight:700;letter-spacing:.1em}
+h1{font-size:28pt;letter-spacing:-.045em;line-height:1.15;margin:7mm 0 3mm}
+h2{font-size:18pt;margin:4mm 0 2mm;color:#24493e;line-height:1.25}
+h3{font-size:11.5pt;margin:4mm 0 1mm}
+p{margin:1.3mm 0 2.7mm}
+.intro{font-size:11.5pt;color:#555650;margin-bottom:5mm}
+.tag{color:#70512d;font-weight:700;font-size:9pt;letter-spacing:.12em;margin-top:6mm}
+figure{margin:4mm 0 3mm}
+svg{width:100%;display:block}
+figcaption{color:#5a5b51;font-size:9pt;margin-top:1mm}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:0 5mm;border-top:1px solid #dbd3c6}
+.legend div{padding:2mm 0;border-bottom:1px solid #dbd3c6}
+.legend b{color:#24493e}
+.note{background:#eef3ef;border:1px solid #cddbd1;border-radius:2mm;padding:2.7mm 3.5mm;margin:4mm 0}
+.note strong{color:#24493e}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:2mm;margin-top:3mm}
+.quick article{background:#f3f1eb;border:1px solid #d9d0c1;border-radius:2mm;padding:2.4mm;font-size:9pt}
+.quick svg{height:14mm;width:100%;margin-bottom:1mm}
+.quick p{margin:1mm 0 0}
+.views{display:grid;grid-template-columns:2fr 3fr;gap:3mm}
+.views figure{padding:2.5mm;border:1px solid #d9d0c1;border-radius:2mm}
+.views figcaption{border-top:1px solid #e5decf;padding-top:1.4mm}
+.install-picture{background:#f5f2eb;border:1px solid #d9d0c1;border-radius:2mm;padding:2mm}
+.diagram-label{fill:#24493e;font:700 17px "Microsoft YaHei",sans-serif}
+.diagram-small{fill:#53534d;font:14px "Microsoft YaHei",sans-serif}
+.steps{margin:2mm 0 3mm;padding-left:6mm}
+.steps li{padding-left:1mm;margin-bottom:1.9mm}
+table{border-collapse:collapse;width:100%;font-size:10pt;margin:2mm 0}
+th,td{padding:2.3mm 2.7mm;text-align:left;vertical-align:top;border-bottom:1px solid #e0dbd1}
+th{background:#eaf0ec;color:#24493e}
+td:first-child{font-weight:700;width:29%}
+.footer{position:absolute;bottom:9mm;left:17mm;right:17mm;border-top:1px solid #c6b9a4;padding-top:2mm;display:flex;justify-content:space-between;color:#5d5c55;font-size:8.5pt}
+a{color:#254a40;font-weight:700;text-underline-offset:2px}
+code{font-family:Consolas,monospace;font-size:.91em}
+</style>
+<section class="page">
+<header class="top"><span class="brand">FUJI R2</span><span>富士山沙盘控制器</span></header>
+<h1>控制器使用说明</h1>
+<p class="intro">TRACK 1、2、3 可独立启停。列车到端后自动停站、换向，往返运行。</p>
+<h2>认识面板</h2>
+<figure>
+<svg viewBox="0 0 846 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="三路控制面板正视示意图">
+<defs>
+  <linearGradient id="panel" x2="0" y2="1" gradientUnits="objectBoundingBox"><stop stop-color="#d9bd93"/><stop offset="1" stop-color="#bd9a6e"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#737975"/><stop offset=".25" stop-color="#f5f6f2"/><stop offset=".44" stop-color="#a4a8a4"/><stop offset=".68" stop-color="#e8ebea"/><stop offset="1" stop-color="#717570"/></linearGradient>
+  <radialGradient id="cap" cx=".32" cy=".26" r=".76"><stop stop-color="#f3f4f0"/><stop offset="1" stop-color="#898e88"/></radialGradient>
+  <linearGradient id="grip" x2="0" y2="1"><stop stop-color="#4d4c47"/><stop offset="1" stop-color="#111312"/></linearGradient>
+  <path id="speedTick" d="M0-68v7" stroke="#62645f" stroke-width="2.4" stroke-linecap="round"/>
+  <g id="speed">
+    <use href="#speedTick" transform="rotate(-132)"/><use href="#speedTick" transform="rotate(-108)"/>
+    <use href="#speedTick" transform="rotate(-84)"/><use href="#speedTick" transform="rotate(-60)"/>
+    <use href="#speedTick" transform="rotate(-36)"/><use href="#speedTick" transform="rotate(-12)"/>
+    <use href="#speedTick" transform="rotate(12)"/><use href="#speedTick" transform="rotate(36)"/>
+    <use href="#speedTick" transform="rotate(60)"/><use href="#speedTick" transform="rotate(84)"/>
+    <use href="#speedTick" transform="rotate(108)"/><use href="#speedTick" transform="rotate(132)"/>
+    <circle r="48" fill="url(#metal)" stroke="#85827b"/><path d="m-44-16 12 4-8 7z" fill="#2b2d28"/>
+    <circle r="35" cy="2" fill="url(#grip)"/><circle r="31" cy="2" fill="none" stroke="#777771" stroke-width="3" stroke-dasharray="1.2 3.4"/>
+    <circle r="25" cy="2" fill="url(#cap)" stroke="#181b18" stroke-width="2.8"/>
+    <path d="m-17-14 34 30m-16-37v47m17-39-34 29m-6-15h45" stroke="#fff" stroke-opacity=".35" stroke-width=".8"/>
+  </g>
+  <g id="lightKnob"><circle r="20" fill="url(#metal)" stroke="#817863"/><circle r="16" fill="url(#cap)" stroke="#eee8dc"/></g>
+  <g id="button"><circle r="21" fill="url(#metal)" stroke="#817863"/><circle r="16" fill="#323b3b"/><circle r="13" fill="url(#cap)" stroke="#a9deed" stroke-width="3"/></g>
+  <g id="time"><path d="M-26 15A30 30 0 1 1 26 15" fill="none" stroke="#62645f" stroke-width="2.6"/><circle r="26" fill="url(#metal)" stroke="#64665d" stroke-width="1.2"/><circle r="23" fill="none" stroke="#7d7a66" stroke-width="2" stroke-dasharray="1.1 3.2"/><circle r="18" fill="#ecebe2"/><path d="m0-14 4 7h-8z" fill="#383b33"/></g>
+  <g id="bulb" fill="#62645f"><path d="M-6 0a8 8 0 1 1 12 0c-2 2-2 3-2 4h-8c0-1 0-2-2-4z"/><rect x="-4" y="6" width="8" height="2.5" rx="1"/></g>
+  <g id="clock" fill="none" stroke="#62645f" stroke-width="2"><circle cy="1" r="7"/><path d="M0-7v-4m-2 0h4m3 6 2-2M0-3v4l3 2"/></g>
+  <g id="group">
+    <use href="#speed" y="120"/><use href="#lightKnob" x="-63" y="224"/><use href="#button" y="224"/><use href="#time" x="64" y="224"/>
+    <use href="#bulb" x="-63" y="266"/><use href="#clock" x="64" y="266"/>
+  </g>
+</defs>
+<rect x="15" y="43" width="807" height="245" rx="17" fill="#604a35"/>
+<rect x="15" y="34" width="807" height="244" rx="17" fill="url(#panel)" stroke="#806246" stroke-width="2"/>
+<g fill="#62645f" text-anchor="middle" font-family="Arial,sans-serif" font-size="15.5" font-weight="700" letter-spacing="1.2">
+  <use href="#group" x="240"/><text x="240" y="184">TRACK 1</text>
+  <use href="#group" x="460"/><text x="460" y="184">TRACK 2</text>
+  <use href="#group" x="680"/><text x="680" y="184">TRACK 3</text>
+</g>
+<circle cx="74" cy="98" r="16" fill="url(#metal)" stroke="#78614b"/><circle cx="74" cy="98" r="11" fill="#a33d2b"/><circle cx="71" cy="95" r="4" fill="#e17e64"/>
+<path d="m76 143-9 13h6l-3 11 11-15h-6l4-9z" fill="#62645f"/>
+<g stroke="#62645f" stroke-width="2" stroke-linecap="round"><path d="M55 180h38m-38 6h38m-34-9v13m10-13v13m10-13v13m10-13v13"/></g>
+<rect x="51" y="202" width="46" height="50" rx="3" fill="#211f1b"/><rect x="56" y="206" width="36" height="40" rx="1" fill="url(#grip)" stroke="#51504b"/>
+<text x="74" y="223" text-anchor="middle" font-family="Arial" font-size="13" fill="#fff">I<tspan x="74" dy="17">O</tspan></text>
+<g stroke="#24493e" stroke-width="1.8" fill="none">
+<path d="M74 78V58H108"/><path d="M74 251v57"/><path d="M241 70V23h32"/><path d="M177 202v-39h-15"/><path d="M241 247v61"/><path d="M304 192v-29h12"/>
+</g>
+<g fill="#24493e"><circle cx="118" cy="58" r="12"/><circle cx="74" cy="308" r="12"/><circle cx="284" cy="23" r="12"/><circle cx="150" cy="163" r="12"/><circle cx="241" cy="308" r="12"/><circle cx="328" cy="163" r="12"/></g>
+<g fill="#fff" text-anchor="middle" dominant-baseline="central" font-family="Arial" font-size="14" font-weight="bold">
+<text x="118" y="58">1</text><text x="74" y="308">2</text><text x="284" y="23">3</text><text x="150" y="163">4</text><text x="241" y="308">5</text><text x="328" y="163">6</text>
+</g>
+</svg>
+<figcaption>面板正视示意图。③～⑥ 在三组 TRACK 上各有一套。</figcaption>
+</figure>
+<div class="legend">
+<div><b>① 故障指示灯</b><br>红灯亮时，记录故障并按第 3 页处理。</div>
+<div><b>② 轨道总控开关</b><br>I 允许输出。O 关闭三路轨道输出。</div>
+<div><b>③ 速度旋钮</b>　上方，调本路行驶速度。</div>
+<div><b>④ 长点灯旋钮</b>　下排左侧，调停车点灯。</div>
+<div><b>⑤ 启停按钮</b>　下排中间，按一下启动往返，再按一下停止。灯环亮表示正在自动往返。</div>
+<div><b>⑥ 时间旋钮</b>　下排右侧，调本路升速、减速和停站时间。</div>
+</div>
+<h2>上手指南</h2>
+<div class="quick">
+<article><svg viewBox="0 0 120 54" aria-hidden="true"><rect x="21" y="8" width="78" height="39" rx="5" fill="#d9bd93"/><circle cx="59" cy="27" r="13" fill="url(#metal)" stroke="#666"/><circle cx="59" cy="27" r="8" fill="#39433d"/><path d="M82 9 70 21m0-7v7h7" fill="none" stroke="#24493e" stroke-width="2.5"/></svg><b>1　给整机通电</b><p>按沙盘侧面的⑨ 控制器总电源按钮。</p></article>
+<article><svg viewBox="0 0 120 54" aria-hidden="true"><rect x="40" y="4" width="35" height="46" rx="4" fill="#222522"/><rect x="44" y="7" width="27" height="20" rx="2" fill="#60796a"/><text x="57" y="22" text-anchor="middle" fill="#fff" font-size="14">I</text><text x="57" y="42" text-anchor="middle" fill="#fff" font-size="14">O</text><path d="M96 16H77l6-5m-6 5 6 5" fill="none" stroke="#24493e" stroke-width="2.5"/></svg><b>2　允许轨道输出</b><p>③ 速度旋钮先转低。① 故障指示灯熄灭后，② 轨道总控开关拨到 I。</p></article>
+<article><svg viewBox="0 0 120 54" aria-hidden="true"><circle cx="32" cy="27" r="15" fill="url(#metal)"/><circle cx="32" cy="27" r="10" fill="#a6afb2" stroke="#698e9e" stroke-width="2"/><circle cx="78" cy="27" r="21" fill="url(#metal)"/><circle cx="78" cy="27" r="15" fill="#252825"/><path d="M70 16a17 17 0 0 1 28 5m-6-1 6 1v-6" fill="none" stroke="#f4f0e6" stroke-width="2"/></svg><b>3　启动一路</b><p>确认车在线路两端之间。按本路⑤ 启停按钮，再缓慢调高③ 速度旋钮。</p></article>
+<article><svg viewBox="0 0 120 54" aria-hidden="true"><circle cx="32" cy="28" r="15" fill="url(#metal)"/><circle cx="32" cy="28" r="10" fill="#a6a7a0" stroke="#7a8078" stroke-width="2"/><rect x="67" y="7" width="30" height="42" rx="4" fill="#222522"/><text x="82" y="42" text-anchor="middle" fill="#fff" font-size="15">O</text><path d="M52 27h10m-5-4 5 4-5 4" fill="none" stroke="#24493e" stroke-width="2"/></svg><b>4　停止运行</b><p>再按本路⑤ 启停按钮停止往返。要关闭三路轨道输出，将② 轨道总控开关拨到 O。</p></article>
+</div>
+<p>首次调整③ 速度旋钮或⑥ 时间旋钮后，观察一个完整往返，确认列车在两端都能提前停稳。</p>
+<footer class="footer"><span>富士山沙盘 · 客户使用手册</span><span>01 / 04</span></footer>
+</section>
+<section class="page">
+<header class="top"><span class="brand">FUJI R2</span><span>安装与连接</span></header>
+<h1>挂装控制器</h1>
+<div class="views">
+<figure>
+<svg viewBox="0 0 300 198" role="img" aria-label="控制器左侧视图，DB25 接口呈竖向">
+<path d="M66 26h110l74 129H66z" fill="#604a35" stroke="#59412e" stroke-width="3"/>
+<path d="M177 27l75 128" stroke="#c7a477" stroke-width="9" stroke-linecap="round"/>
+<path d="m199 59 17-10 14 24-17 9m15 32 14-8 12 21-14 8" fill="#3d403c" stroke="#292c29" stroke-width="2"/>
+<g transform="translate(114 99) rotate(-90)">
+  <rect x="-50" y="-15" width="100" height="30" rx="4" fill="url(#metal)" stroke="#979990" stroke-width="1.5"/>
+  <circle cx="-42" r="4" fill="#4a4e47"/><circle cx="42" r="4" fill="#4a4e47"/>
+  <path d="M-35-10h70l-5 20h-60z" fill="#202925"/>
+  <path d="M-29-3h62m-59 6h57" stroke="#e1dcd0" stroke-width="2.6" stroke-linecap="round" stroke-dasharray=".1 4.75"/>
+</g>
+<path d="M113 137v24H54" fill="none" stroke="#24493e" stroke-width="2.5"/>
+<circle cx="39" cy="161" r="15" fill="#24493e"/><text x="39" y="167" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">7</text>
+</svg>
+<figcaption>左侧视图 · ⑦ DB25 接口</figcaption>
+</figure>
+<figure>
+<svg viewBox="0 0 450 198" role="img" aria-label="控制器背面视图，两个钥匙形挂孔">
+<defs><path id="keySlot" d="M-4.5 6V-12a4.5 4.5 0 0 1 9 0V6a9.5 9.5 0 1 1-9 0z"/></defs>
+<rect x="21" y="22" width="408" height="151" rx="12" fill="#765c43" stroke="#59412e" stroke-width="3"/>
+<rect x="29" y="30" width="392" height="135" rx="9" fill="#96775a" stroke="#6b523b" stroke-width="1.6"/>
+<path d="M77 85H373m-296-6v12m296-12v12" fill="none" stroke="#e7d6b7" stroke-dasharray="3 3"/>
+<path d="M77 74H373m-296-4v8m296-8v8" stroke="#e7d6b7" stroke-width="1.4"/>
+<text x="225" y="66" text-anchor="middle" fill="#fff5e3" font-size="15">146 mm</text>
+<use href="#keySlot" x="77" y="106" fill="#292721" stroke="#e2bc90" stroke-width="1.3"/>
+<use href="#keySlot" x="373" y="106" fill="#292721" stroke="#e2bc90" stroke-width="1.3"/>
+<path d="M77 127v37h62m234-37v37h-62" fill="none" stroke="#edf0dd" stroke-width="2"/>
+<circle cx="154" cy="164" r="15" fill="#24493e"/><circle cx="296" cy="164" r="15" fill="#24493e"/>
+<text x="154" y="169" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">8</text>
+<text x="296" y="169" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">8</text>
+</svg>
+<figcaption>背面视图 · ⑧ 挂孔，左右各一处</figcaption>
+</figure>
+</div>
+<h2>安装位置与连接</h2>
+<figure class="install-picture">
+<svg viewBox="0 0 846 256" role="img" aria-label="控制器挂在沙盘侧板，DB25 线从左侧连接，整机电源按钮装在沙盘侧板">
+<defs><marker id="mountArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 7 3.5 0 7z" fill="#24493e"/></marker></defs>
+<g>
+  <rect x="130" y="27" width="634" height="179" rx="7" fill="#d3ae81" stroke="#a18362" stroke-width="3"/>
+  <path d="M130 45h634" stroke="#ead3b3" stroke-width="3"/>
+  <text x="177" y="75" class="diagram-label">沙盘侧板</text>
+  <rect x="338" y="67" width="294" height="110" rx="9" fill="#edddc6" fill-opacity=".63" stroke="#80684f" stroke-width="2" stroke-dasharray="5 4"/>
+  <use href="#keySlot" transform="translate(377 84) scale(.68)" fill="none" stroke="#80684f" stroke-width="2"/>
+  <use href="#keySlot" transform="translate(595 84) scale(.68)" fill="none" stroke="#80684f" stroke-width="2"/>
+  <circle cx="377" cy="92" r="5" fill="#5e645a"/><circle cx="595" cy="92" r="5" fill="#5e645a"/>
+  <path d="M650 73v43" fill="none" stroke="#24493e" stroke-width="3" marker-end="url(#mountArrow)"/>
+  <text x="672" y="100" class="diagram-label">下移 8 mm</text>
+  <rect x="334" y="112" width="298" height="94" rx="10" fill="#9d7756" stroke="#5f4735" stroke-width="3"/>
+  <rect x="344" y="120" width="284" height="80" rx="8" fill="#dbc197"/>
+  <g fill="#2b3029" stroke="#888976" stroke-width="3"><circle cx="407" cy="147" r="13"/><circle cx="487" cy="147" r="13"/><circle cx="567" cy="147" r="13"/></g>
+  <g fill="#b5b6ae" stroke="#686b62" stroke-width="1.3"><circle cx="389" cy="177" r="5"/><circle cx="406" cy="177" r="5"/><circle cx="423" cy="177" r="6"/><circle cx="470" cy="177" r="5"/><circle cx="487" cy="177" r="5"/><circle cx="504" cy="177" r="6"/><circle cx="550" cy="177" r="5"/><circle cx="567" cy="177" r="5"/><circle cx="584" cy="177" r="6"/></g>
+  <rect x="355" y="168" width="13" height="16" rx="2" fill="#262a25"/>
+  <path d="M33 162h151q24 0 39-12h77" fill="none" stroke="#6c746c" stroke-width="8" stroke-linecap="round"/>
+  <path d="M282 139h34l10 7v17l-10 7h-34z" fill="#e4ded0" stroke="#696d65" stroke-width="2"/>
+  <path d="M326 154h7" stroke="#24493e" stroke-width="2.5" marker-end="url(#mountArrow)"/>
+  <circle cx="244" cy="98" r="16" fill="url(#metal)" stroke="#5f675c" stroke-width="2"/>
+  <circle cx="244" cy="98" r="10" fill="#50594f"/>
+  <path d="M244 115v8m64 49v45h-40m108-127h-15V64" fill="none" stroke="#24493e" stroke-width="2"/>
+  <text x="151" y="137" class="diagram-label">⑨ 控制器总电源按钮</text>
+  <text x="190" y="233" class="diagram-label">⑦ DB25 接口</text>
+  <text x="339" y="57" class="diagram-label">⑧ 挂孔</text>
+</g>
+</svg>
+<figcaption>⑨ 控制器总电源按钮位于沙盘侧板。按一下通电，再按一下断电。图中位置为示意。</figcaption>
+</figure>
+<ol class="steps">
+<li>将② 轨道总控开关拨到 O，关闭⑨ 控制器总电源按钮。</li>
+<li>左侧留出插拔空间。将⑧ 挂孔的大圆口套在侧板的两颗挂装螺钉上，向下移动盒体约 8 mm，让螺钉滑入窄槽。</li>
+<li>将配套插头插入左侧⑦ DB25 接口，手拧紧插头两端的螺钉。线缆留一点松弛，按第 1 页「上手指南」通电试车。</li>
+</ol>
+<footer class="footer"><span>富士山沙盘 · 客户使用手册</span><span>02 / 04</span></footer>
+</section>
+<section class="page">
+<header class="top"><span class="brand">FUJI R2</span><span>日常操作</span></header>
+<h1>调节与故障排查</h1>
+<div class="note">
+<p><strong>④ 长点灯旋钮。</strong>本路运行时，先按⑤ 启停按钮停止往返。缓慢调高④ 长点灯旋钮，直到车灯亮、列车不动。列车爬行时调低，换车后重新检查。</p>
+<p><strong>⑥ 时间旋钮。</strong>顺时针转动会延长升速、端点减速和停站时间。列车停稳后，在停站中点换向，停站结束后发车。</p>
+</div>
+<h2>常见现象</h2>
+<table>
+<thead><tr><th>看到的现象</th><th>检查与处理</th></tr></thead>
+<tbody>
+<tr><td>三路车都不动</td><td>确认⑨ 控制器总电源按钮已打开、② 轨道总控开关在 I，① 故障指示灯熄灭。按本路⑤ 启停按钮，从低速起步。</td></tr>
+<tr><td>⑤ 启停按钮灯环亮，车不动</td><td>等停站结束，再略调高③ 速度旋钮。若仍不动，清洁车轮和轨面，换一辆正常的车对比。</td></tr>
+<tr><td>列车到端不停车，或停车太靠外</td><td>将② 轨道总控开关拨到 O。检查端点有无遮挡、脏污或车辆脱轨，并在上位机看端点触发计数。若触发正常但停车距离过长，降低③ 速度旋钮，缩短端点减速时间，再低速复测。</td></tr>
+<tr><td>停车时车灯灭了，或列车缓慢爬行</td><td>把④ 长点灯旋钮从低位慢慢调到「灯亮、车不动」。灯亮时若车辆仍在爬行，先调低④ 长点灯旋钮，再检查该车的取电与走行情况。</td></tr>
+<tr><td>① 故障指示灯亮红灯</td><td>将② 轨道总控开关拨到 O，关闭⑨ 控制器总电源按钮，拔掉 USB。排查轨道上的金属杂物和脱轨车辆。排除故障后重新通电，先低速试一路。若① 故障指示灯再次亮起，停用设备并记录线路和发生时机，联系维护人员。</td></tr>
+</tbody>
+</table>
+<footer class="footer"><span>富士山沙盘 · 客户使用手册</span><span>03 / 04</span></footer>
+</section>
+<section class="page">
+<header class="top"><span class="brand">FUJI R2</span><span>电脑维护</span></header>
+<h1>在线调参与固件升级</h1>
+<p class="intro">需要调参、检查输入或升级固件时，再连接电脑。</p>
+<h2>下载与连接</h2>
+<p>在 GitHub 下载 Windows 上位机和标准 R2 固件。软件的安装、连接和故障排查见仓库首页的 README。<br><a href="https://github.com/GavinGuoUom/fuji-r2-controller">github.com/GavinGuoUom/fuji-r2-controller</a></p>
+<p>将② 轨道总控开关拨到 O，控制器保持通电。用 USB 数据线连接 Mega2560。打开上位机，选择出现的 COM 端口并点击「连接」。</p>
+<h2>在线调参</h2>
+<ol class="steps">
+<li><b>记录原设置。</b>进入「在线调参」，点击「重新读取」，记录八项设置。</li>
+<li><b>调整参数。</b>「长点灯」限定④ 长点灯旋钮的最大输出。停站和满量程加速时间各设上下限。减速时间上限为 0 时，到端点直接降至长点灯占空比。开启端点减速后，⑥ 时间旋钮越大，降至该占空比所用的时间越长。</li>
+<li><b>应用并保存。</b>点「立即应用」。收到回执后，保持② 轨道总控开关在 O，点「保存到控制器」，等待校验通过。更换电位器后，可逐只反向或「全部反向」，再用「引导测试」核对方向。</li>
+<li><b>试车。</b>「传感器到区间末端」填六个端点中最短的实测余距。逐步提速，确认每次都能在末端前停稳。</li>
+</ol>
+<h2>固件升级</h2>
+<ol class="steps">
+<li>先读回并记录参数。将② 轨道总控开关拨到 O，在上位机点击「断开」，关闭其他正在使用该 COM 端口的串口程序。</li>
+<li>按 GitHub README 的「固件升级」步骤，使用 PlatformIO 和 <code>fuji_mega_three_r2</code> 环境上传。确认选中的是这台控制器的 COM 端口。</li>
+<li>刷写时保持 USB 连接，等待校验通过。重新连接上位机，核对② 轨道总控开关为 O、三路输出为零、无故障，并比对保存参数。随后低速试跑，检查端点减速、停站和换向。</li>
+</ol>
+<div class="note"><strong>适用版本</strong>　富士山沙盘交付机使用 Arduino Mega2560 与 Fuji R2 扩展板。请使用下载页标注的标准 R2 固件。</div>
+<footer class="footer"><span>富士山沙盘 · 客户使用手册</span><span>04 / 04</span></footer>
+</section>
+</html>
