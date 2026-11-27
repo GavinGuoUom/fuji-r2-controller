@@ -8,7 +8,7 @@
 
 | 文件 | 用途 |
 | --- | --- |
-| [控制器使用手册 HTML](fuji-r2-user-manual.html) | 解压后用浏览器打开，可打印为 A4 |
+| 控制器使用手册 | [简体中文](fuji-r2-user-manual.html) · [繁體中文（香港）](fuji-r2-user-manual-zh-HK.html) · [English](fuji-r2-user-manual-en.html)。解压后用浏览器打开，可打印为 A4 |
 | [Windows 上位机](software/) | 调试台程序、启动脚本和依赖清单 |
 | [标准 R2 固件](firmware/) | 可直接用 PlatformIO 构建的固件源码 |
 | [标准 R2 固件 HEX](fuji-r2-mega2560.hex) | 供维护人员使用的预编译镜像 |
