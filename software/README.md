@@ -1,10 +1,14 @@
 # Fuji R2 线路调试台
 
+简体中文 | [English](README.en.md)
+
 Windows 双击 `launch.cmd`，服务会打开本机浏览器。脚本优先使用 PlatformIO 的 Python 环境。也可以用 Python 3.10 及以上版本，从项目根目录运行 `python -m pip install -r software/requirements.txt` 和 `python software/console.py`。默认地址为 `http://127.0.0.1:8765`。退出时关闭窗口，或在终端按 Ctrl+C。
 
 连接普通 USB 数据线前，把轨道总控拨到 OFF，关闭控制器总电源，确保 USB 未接，并**拔下 R2 扩展板上的 JP3201 跳线帽**。接 USB 期间保持 JP3201 断开。在线调试需要控制器供电时，再打开控制器总电源，轨道总控先保持 OFF。调试结束后，关闭控制器总电源、拔掉 USB，再装回 JP3201。
 
 关闭占用串口的其他程序，在控制台选择 Mega 的串口并连接。串口使用 115200、8N1。没有硬件时可选「离线演示」。
+
+页面右上角可切换「简体中文」和「English」。语言选择保存在当前浏览器。
 
 ## 使用
 

@@ -59,6 +59,14 @@ let tuningLookup = "";
 let dirty = false;
 let lastReply = "";
 const flash = Array.from({length: 3}, () => [0,0,0]);
+const events = [];
+let notice = () => "";
+const trackName = n => t("线路 {0}", n);
+const testName = key => {
+  if (key.startsWith("pot")) return t("{0}旋钮", t(names[TESTS[key].channel]));
+  if (key === "L" || key === "R") return t("{0} 端传感器", key);
+  return t(TESTS[key].name);
+};
 
 function newHit(route, before, index) {
   if (!before) return false;
@@ -78,7 +86,7 @@ function percentage(pwm) {
 }
 
 function seconds(ms) {
-  return ms == null ? "—" : (ms/1000).toLocaleString("zh-CN",{maximumFractionDigits:3})+" s";
+  return ms == null ? "—" : (ms/1000).toLocaleString(fujiLanguage,{maximumFractionDigits:3})+" s";
 }
 
 async function api(route, data) {
@@ -91,6 +99,12 @@ async function api(route, data) {
 }
 
 function notify(message) {
+  notice = typeof message === "function" ? message : () => t(message);
+  renderNotice();
+}
+
+function renderNotice() {
+  const message = notice();
   $("notice").textContent = message;
   $("notice").hidden = !message;
 }
@@ -103,7 +117,7 @@ async function loadPorts() {
     for (const p of found) {
       $("ports").append(new Option(p.device + (p.description ? " · " + p.description : ""),p.device));
     }
-    $("ports").append(new Option("离线演示","demo"));
+    $("ports").append(new Option(t("离线演示"),"demo"));
     if (Array.from($("ports").options).some(option => option.value===saved)) $("ports").value = saved;
     if (!serialInstalled) notify("未安装 pyserial，可先使用离线演示。");
   } catch (error) {
@@ -119,7 +133,7 @@ function choosePage(next) {
     tab.setAttribute("aria-current",active?"page":"false");
   }
   for (const section of document.querySelectorAll(".page")) section.hidden = section.id!==next;
-  [ $("page-title").textContent, $("page-description").textContent ] = pageCopy[next];
+  [ $("page-title").textContent, $("page-description").textContent ] = pageCopy[next].map(value => t(value));
   if (page==="guide" && !baseline && stage===0) resetGuide();
   render();
 }
@@ -130,23 +144,31 @@ function seedTrackCards() {
     const card = document.createElement("article");
     card.className = "panel track-card";
     card.innerHTML = `
-      <div class="section-head"><h3>线路 ${i}</h3><span class="pill" id="state-${i}">离线</span></div>
+      <div class="section-head"><h3>${trackName(i)}</h3><span class="pill" id="state-${i}">${t("离线")}</span></div>
       <div class="rail"><span class="endpoint" id="left-${i}">L —</span><div class="rails"><b id="dir-${i}">—</b></div><span class="endpoint" id="right-${i}">R —</span></div>
-      <div class="power-line"><span>轨道 PWM</span><strong id="pwm-${i}">—</strong></div>
+      <div class="power-line"><span>${t("轨道 PWM")}</span><strong id="pwm-${i}">—</strong></div>
       <div class="power-bar"><i id="bar-${i}" style="width:0%"></i></div>
-      <div class="metrics">${labels.map((label,n)=>`<div><span>${label}</span><b id="metric-${i}-${n}">—</b></div>`).join("")}</div>
-      <div class="raw"><span>ADC · 速度 / 时间 / 点灯</span><code id="adc-${i}">—</code></div>`;
+      <div class="metrics">${labels.map((label,n)=>`<div><span>${t(label)}</span><b id="metric-${i}-${n}">—</b></div>`).join("")}</div>
+      <div class="raw"><span>${t("ADC · 速度 / 时间 / 点灯")}</span><code id="adc-${i}">—</code></div>`;
     $("tracks").append(card);
   }
 }
 
 function addEvent(message) {
+  const label = typeof message === "function" ? message : () => t(message);
+  const entry = { time: new Date(), label };
+  events.unshift(entry);
+  if (events.length>80) events.pop();
+  $("event-list").prepend(eventRow(entry));
+  if ($("event-list").children.length>80) $("event-list").lastChild.remove();
+}
+
+function eventRow({time,label}) {
   const li = document.createElement("li");
   const clock = document.createElement("time");
-  clock.textContent = new Date().toLocaleTimeString("zh-CN",{hour12:false});
-  li.append(clock,document.createTextNode(message));
-  $("event-list").prepend(li);
-  while ($("event-list").children.length>80) $("event-list").lastChild.remove();
+  clock.textContent = time.toLocaleTimeString(fujiLanguage,{hour12:false});
+  li.append(clock,document.createTextNode(label()));
+  return li;
 }
 
 function recordEvents(frame) {
@@ -155,7 +177,8 @@ function recordEvents(frame) {
     return;
   }
   if (frame.system.fault!==previous.system.fault) {
-    addEvent(faultNames[frame.system.fault] || `故障 F=${frame.system.fault}`);
+    const code = frame.system.fault;
+    addEvent(() => faultNames[code] ? t(faultNames[code]) : t("故障 F={0}", code));
   }
   if (frame.system.total_n!==previous.system.total_n) addEvent(frame.system.total_n?"总控 OFF":"总控 ON");
   frame.tracks.forEach((r,i) => {
@@ -164,16 +187,17 @@ function recordEvents(frame) {
       if (!newHit(r,old,k)) return;
       flash[i][k] = Date.now()+900;
       const labels = ["按键","左端 L","右端 R"];
-      addEvent(`线路 ${i+1} · ${labels[k]} +${(hits-old.hits[k]+65536)%65536}`);
+      const count = (hits-old.hits[k]+65536)%65536;
+      addEvent(() => `${trackName(i+1)} · ${t(labels[k])} +${count}`);
     });
-    if (r.direction!==old.direction) addEvent(`线路 ${i+1} · 切向 ${r.direction}`);
+    if (r.direction!==old.direction) addEvent(() => `${trackName(i+1)} · ${t("切向 {0}", r.direction)}`);
   });
 }
 
 function renderMonitor(frame) {
   for (let i=1;i<=3;i++) {
     const r = frame?.tracks[i-1];
-    h(`state-${i}`,r ? stateNames[r.state]??`状态 ${r.state}` : "离线",r?.state>=3?"good":"");
+    h(`state-${i}`, r ? (stateNames[r.state] ? t(stateNames[r.state]) : t("状态 {0}",r.state)) : t("离线"),r?.state>=3?"good":"");
     h(`dir-${i}`,r?.state ? (r.direction==="L"?"←":"→") : "—");
     h(`pwm-${i}`,percentage(r?.pwm));
     $(`bar-${i}`).style.width = percentage(r?.pwm??0);
@@ -194,12 +218,12 @@ function guideRoute() { return Number($("guide-track").value); }
 function seedInputPanel() {
   $("test-rotaries").innerHTML = names.map((name,i)=>`
     <div class="input-tile" data-input="pot${i}">
-      <span>${name}</span><div class="dial" aria-hidden="true"><i></i></div>
+      <span>${t(name)}</span><div class="dial" aria-hidden="true"><i></i></div>
       <strong id="test-pot${i}">—</strong><small id="test-raw${i}">ADC —</small>
     </div>`).join("");
   $("test-digital").innerHTML = [["master","总控"],["button","启停按钮"],["L","L 端"],["R","R 端"]].map(([key,label])=>`
     <div class="input-tile digital" data-input="${key}">
-      <span><i class="input-light" aria-hidden="true"></i>${label}</span>
+      <span><i class="input-light" aria-hidden="true"></i>${t(label)}</span>
       <strong id="test-${key}">—</strong><small id="detail-${key}"></small>
     </div>`).join("");
 }
@@ -207,7 +231,7 @@ function seedInputPanel() {
 function renderInputPanel(frame, index) {
   const r = frame?.tracks[index];
   const now = Date.now();
-  h("panel-track",`线路 ${index+1}`);
+  h("panel-track",trackName(index+1));
   document.querySelector(".test-panel").classList.toggle("no-sample",!r);
   for (const el of document.querySelectorAll(".test-panel [data-input]")) {
     el.classList.toggle("selected",el.dataset.input===test);
@@ -233,7 +257,7 @@ function renderInputPanel(frame, index) {
     const recent = flash[index][i]>now;
     const label = held ? (i ? "触发中" : "按下") : recent ? (i ? "检测到脉冲" : "检测到按键") : (i ? "待触发" : "松开");
     const port = i ? `${ports[index+1][i-1]} · ` : "";
-    digital(key,held||recent,label,`${port}计数 ${r?.hits[i]??"—"}`);
+    digital(key,held||recent,t(label),port+t("计数 {0}",r?.hits[i]??"—"));
   });
 }
 
@@ -248,7 +272,10 @@ function finishStep(source) {
   const selected = TESTS[test];
   if (stage>=selected.steps.length) return;
   results[stage] = source;
-  addEvent(`${selected.shared?"":`线路 ${guideRoute()} · `}${selected.name} · ${selected.steps[stage].title}（${source}）`);
+  const key = test;
+  const route = guideRoute();
+  const title = selected.steps[stage].title;
+  addEvent(() => `${selected.shared?"":trackName(route)+" · "}${testName(key)} · ${t(title)} · ${t(source)}`);
   stage += 1;
   baseline = status.frame?.tracks[guideRoute()-1];
   renderGuide();
@@ -262,19 +289,19 @@ function renderGuide() {
   const row = frame?.tracks[index];
   const system = frame?.system;
   const complete = !step;
-  const name = `${selected.shared?"总控":`线路 ${index+1}`} / ${selected.name}`;
+  const name = `${selected.shared?t("总控"):trackName(index+1)} / ${testName(test)}`;
   h("guide-type",name);
-  h("guide-title",complete?"测试完成":step.title);
+  h("guide-title",complete?t("测试完成"):t(step.title));
   const connector = (test==="L" || test==="R") ? ` · ${ports[index+1][test==="L"?0:1]}` : "";
-  h("guide-text",complete ? "可在左侧选择其他组件，或重新开始此项。": step.text+connector);
-  let display = "等待实时数据";
+  h("guide-text",complete ? t("可在左侧选择其他组件，或重新开始此项。"): t(step.text)+connector);
+  let display = t("等待实时数据");
   if (row && system) {
-    display = `总控 ${system.total_n?"OFF":"ON"} · PWM ${percentage(row.pwm)}`;
+    display = t(system.total_n?"总控 OFF":"总控 ON") + ` · PWM ${percentage(row.pwm)}`;
     if (test.startsWith("pot")) display += ` · ADC ${row.adc[selected.channel]} / 1023`;
-    if (test==="indicator") display += ` · F=${system.fault} · 锁存 ${system.latch}`;
-    if (test==="L" || test==="R" || test==="button") display += ` · 事件计数 ${row.hits[selected.channel]}`;
+    if (test==="indicator") display += ` · F=${system.fault} · ${t("锁存 {0}",system.latch)}`;
+    if (test==="L" || test==="R" || test==="button") display += " · "+t("事件计数 {0}",row.hits[selected.channel]);
   }
-  if ((test==="L" || test==="R") && status.tuning?.[5]) display += ` · 设定余距 ${status.tuning[5]} mm`;
+  if ((test==="L" || test==="R") && status.tuning?.[5]) display += " · "+t("设定余距 {0} mm",status.tuning[5]);
   h("guide-live",display);
   renderInputPanel(frame,index);
   $("guide-steps").replaceChildren(...selected.steps.map((item,n)=>{
@@ -283,7 +310,7 @@ function renderGuide() {
     const mark = document.createElement("span");
     mark.className = "check";
     mark.textContent = n<stage?"✓":String(n+1).padStart(2,"0");
-    line.append(mark,document.createTextNode(item.title+(results[n]?` · ${results[n]}`:"")));
+    line.append(mark,document.createTextNode(t(item.title)+(results[n]?` · ${t(results[n])}`:"")));
     return line;
   }));
   $("confirm").disabled = complete;
@@ -303,17 +330,17 @@ function seedRotaryDirections() {
   grid.append(document.createElement("span"));
   for (const name of names) {
     const header = document.createElement("span");
-    header.textContent = name;
+    header.dataset.copy = name;
     grid.append(header);
   }
   for (let i=0; i<3; i++) {
     const track = document.createElement("span");
-    track.textContent = `线路 ${i+1}`;
+    track.dataset.track = i+1;
     grid.append(track);
     for (const name of names) {
       const box = document.createElement("input");
       box.type = "checkbox";
-      box.setAttribute("aria-label", `线路 ${i+1} ${name}反向`);
+      box.dataset.rotary = name;
       box.addEventListener("change",()=>{dirty=true;renderTuning();});
       reverseBoxes.push(box);
       grid.append(box);
@@ -362,7 +389,7 @@ function renderTuning() {
       status.tuning?.length===7 ? "升级固件后可设置旋钮方向。" :
       reverseBlocked ? "请把总控拨回 OFF，再应用旋钮方向。" :
       ready&&!status.tuning ? "等待支持调参协议的 R2 固件" : "";
-  h("tuning-reply",status.pending?"等待控制器响应…":[status.reply,guidance].filter(Boolean).join(" · "));
+  h("tuning-reply",status.pending?t("等待控制器响应…"):[status.reply,guidance].filter(Boolean).map(value=>t(value)).join(" · "));
 }
 
 function render() {
@@ -370,16 +397,16 @@ function render() {
   const active = ready || status.mode==="connecting";
   const frame = ready && (status.mode==="demo" || status.age<=2) ? status.frame : null;
   const system = frame?.system;
-  h("link", status.mode==="demo" ? "● 离线演示" : status.mode==="connecting" ? "● 正在连接" :
-      status.mode==="serial" ? (frame?`● ${status.device} 在线`:`● ${status.device} 无数据`) : "● 离线",
+  h("link", status.mode==="demo" ? t("● 离线演示") : status.mode==="connecting" ? t("● 正在连接") :
+      status.mode==="serial" ? t(frame?"● {0} 在线":"● {0} 无数据",status.device) : t("● 离线"),
     status.mode==="demo"||status.mode==="connecting"?"warm":frame?"good":"");
   h("master",system?(system.total_n?"OFF":"ON"):"—",system&&!system.total_n?"warm":"");
-  h("enabled",system?(system.enabled?"已允许":"已关闭"):"—",system?.enabled?"good":"");
+  h("enabled",system?t(system.enabled?"已允许":"已关闭"):"—",system?.enabled?"good":"");
   const fault = system?.fault ?? 0;
   const affected = system?.mask ? [1,2,3].filter(i=>system.mask & (1<<(i-1))).join("/") : "";
-  h("fault",system ? (fault ? `F=${fault} · ${faultNames[fault]??"未知"}${affected?` · 线路 ${affected}`:""}` : "正常") : "—",system?(fault?"bad":"good"):"");
-  h("age",status.mode==="demo"?"模拟数据":frame?`${status.age.toFixed(2)} s 前`:"—");
-  $("connect").textContent = active?"断开":"连接";
+  h("fault",system ? (fault ? `F=${fault} · ${t(faultNames[fault]??"未知")}${affected?` · ${trackName(affected)}`:""}` : t("正常")) : "—",system?(fault?"bad":"good"):"");
+  h("age",status.mode==="demo"?t("模拟数据"):frame?t("{0} s 前",status.age.toFixed(2)):"—");
+  $("connect").textContent = t(active?"断开":"连接");
   $("ports").disabled = active;
   $("refresh").disabled = active;
   renderMonitor(frame);
@@ -419,7 +446,7 @@ async function readState() {
     }
     render();
   } catch (error) {
-    notify("无法读取本机控制台 · "+error.message);
+    notify(() => t("无法读取本机控制台 · {0}",t(error.message)));
   } finally {
     setTimeout(readState,250);
   }
@@ -430,10 +457,9 @@ async function send(route, values) {
   catch (error) { notify(error.message); }
 }
 
-for (const [key,definition] of Object.entries(TESTS)) {
+for (const key of Object.keys(TESTS)) {
   const button = document.createElement("button");
   button.dataset.test = key;
-  button.textContent = definition.name;
   button.addEventListener("click",()=>{test=key;resetGuide();});
   $("test-options").append(button);
 }
@@ -446,7 +472,7 @@ $("connect").addEventListener("click",()=>{
     send("connect",{device:$("ports").value});
   }
 });
-$("clear-events").addEventListener("click",()=>$("event-list").replaceChildren());
+$("clear-events").addEventListener("click",()=>{events.length=0;$("event-list").replaceChildren();});
 $("guide-track").addEventListener("change",resetGuide);
 $("restart").addEventListener("click",resetGuide);
 $("confirm").addEventListener("click",()=>finishStep("人工确认"));
@@ -479,8 +505,24 @@ $("read").addEventListener("click",()=>{
   send("tuning",{kind:"get"});
 });
 $("save").addEventListener("click",()=>send("tuning",{kind:"save"}));
-seedTrackCards();
-seedInputPanel();
+function renderLanguage() {
+  applyFujiLocale($("language").value);
+  $("tracks").replaceChildren();
+  seedTrackCards();
+  seedInputPanel();
+  for (const button of $("test-options").children) button.textContent = testName(button.dataset.test);
+  for (const el of document.querySelectorAll("#rotary-grid [data-copy]")) el.textContent = t(el.dataset.copy);
+  for (const el of document.querySelectorAll("#rotary-grid [data-track]")) el.textContent = trackName(el.dataset.track);
+  reverseBoxes.forEach((box,i)=>box.setAttribute("aria-label",t("线路 {0} {1}反向",Math.floor(i/3)+1,t(box.dataset.rotary))));
+  const demo = Array.from($("ports").options).find(option=>option.value==="demo");
+  if (demo) demo.textContent = t("离线演示");
+  $("event-list").replaceChildren(...events.map(eventRow));
+  renderNotice();
+  choosePage(page);
+}
 seedRotaryDirections();
+$("language").value = fujiLanguage;
+$("language").addEventListener("change",renderLanguage);
+renderLanguage();
 loadPorts();
 readState();

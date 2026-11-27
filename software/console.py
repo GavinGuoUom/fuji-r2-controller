@@ -344,9 +344,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         elif self.path=="/api/ports":
             ports = [{"device": p.device, "description": p.description} for p in list_ports.comports()] if list_ports else []
             self.json({"ports": ports, "serialInstalled": serial is not None})
-        elif self.path in ("/", "/style.css", "/app.js"):
+        elif self.path in ("/", "/style.css", "/app.js", "/i18n.js"):
             name, kind = {"/": ("index.html", "text/html"), "/style.css": ("style.css", "text/css"),
-                          "/app.js": ("app.js", "application/javascript")}[self.path]
+                          "/app.js": ("app.js", "application/javascript"),
+                          "/i18n.js": ("i18n.js", "application/javascript")}[self.path]
             self.send(200, (ROOT/name).read_bytes(), kind+"; charset=utf-8")
         else:
             self.json({"error": "未找到"}, 404)
